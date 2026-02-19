@@ -1,0 +1,16 @@
+{
+  "name": "forma-embedded-view-sdk-bindings-rust-ui",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/ui-lib",
+    "packages/ui-lib-wasm"
+  ],
+  "scripts": {
+    "build": "npm run build -w packages/ui-lib && npm run build -w packages/ui-lib-wasm",
+    "build:ts": "npm run build -w packages/ui-lib",
+    "build:wasm": "npm run build -w packages/ui-lib-wasm",
+    "example": "npm run example -w packages/ui-lib",
+    "example:wasm": "npm run build:ts && npm run example -w packages/ui-lib-wasm"
+  }
+}

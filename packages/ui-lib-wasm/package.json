@@ -1,0 +1,19 @@
+{
+  "name": "@forma/ui-lib-wasm",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./pkg/forma_ui_lib_wasm.js",
+  "types": "./pkg/forma_ui_lib_wasm.d.ts",
+  "files": [
+    "pkg"
+  ],
+  "scripts": {
+    "build": "wasm-pack build --target web --out-dir pkg",
+    "build:dev": "wasm-pack build --dev --target web --out-dir pkg",
+    "example:build": "wasm-pack build --target web --out-dir pkg example",
+    "example": "npm run example:build && vite serve example"
+  },
+  "peerDependencies": {
+    "@forma/ui-lib": ">=0.1.0"
+  }
+}
