@@ -160,11 +160,8 @@ export class UIBuilder {
   }
 
   renderInto(selector: string): void {
-    if (this.stack.length > 0) {
-      throw new Error(
-        `renderInto() called with ${this.stack.length} unclosed container(s). ` +
-          `Close all col()/row() with endCol()/endRow() first.`,
-      );
+    while (this.stack.length > 0) {
+      this.stack.pop();
     }
     renderTree(selector, this.rootNodes);
   }
