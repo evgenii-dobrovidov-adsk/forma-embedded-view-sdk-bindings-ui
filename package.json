@@ -1,5 +1,5 @@
 {
-  "name": "forma-embedded-view-sdk-bindings-rust-ui",
+  "name": "forma-embedded-view-sdk-bindings-ui",
   "private": true,
   "version": "0.1.0",
   "workspaces": [

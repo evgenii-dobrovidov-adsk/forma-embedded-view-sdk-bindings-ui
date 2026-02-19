@@ -1,4 +1,4 @@
-# forma-embedded-view-sdk-bindings-rust-ui
+# forma-embedded-view-sdk-bindings-ui
 
 > **Disclaimer:** This library is in no way officially supported, endorsed, or otherwise recommended by Autodesk. It is purely experimental. Use at your own risk.
 
