@@ -4,7 +4,7 @@
 
 A strict, sandboxable UI library with a fluent chaining API for building interfaces using [Autodesk Forma Weave](https://app.autodeskforma.eu/design-system/v2) components. Designed to be safely exposed to user-authored code via WASM bindings.
 
-![Example screenshot](screenshot.png)
+![Example screenshot](./screenshot-example.png)
 
 ## Motivation
 
