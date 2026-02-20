@@ -101,16 +101,20 @@ All methods consume `self` and return `UiBuilder` for fluent chaining.
 
 | Constructor | Description |
 |---|---|
-| `UiBuilder::new_col()` | Start a tree rooted in a vertical column layout |
-| `UiBuilder::new_row()` | Start a tree rooted in a horizontal row layout |
+| `UiBuilder::new_col()` | Start a tree rooted in a vertical column layout (default 8px gap) |
+| `UiBuilder::new_col_with_gap(gap_px: i32)` | Start a tree rooted in a vertical column layout with a custom gap |
+| `UiBuilder::new_row()` | Start a tree rooted in a horizontal row layout (default 8px gap) |
+| `UiBuilder::new_row_with_gap(gap_px: i32)` | Start a tree rooted in a horizontal row layout with a custom gap |
 
 ### Layout containers
 
 | Method | Description |
 |---|---|
-| `.col()` | Open a nested column (flex column, stretch cross-axis, start main-axis) |
+| `.col()` | Open a nested column (flex column, stretch cross-axis, start main-axis, default 8px gap) |
+| `.col_with_gap(gap_px: i32)` | Open a nested column with a custom gap |
 | `.end_col()` | Close the current column |
-| `.row()` | Open a nested row (flex row, center both axes, 8px gap) |
+| `.row()` | Open a nested row (flex row, center both axes, default 8px gap) |
+| `.row_with_gap(gap_px: i32)` | Open a nested row with a custom gap |
 | `.end_row()` | Close the current row |
 
 Unclosed containers are auto-closed by `.render_into()`.
