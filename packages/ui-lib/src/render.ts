@@ -127,6 +127,14 @@ function renderText(node: Extract<NodeDesc, { type: 'text' }>): HTMLElement {
     code: 'code',
   };
 
+  if (node.level === 'code') {
+    const pre = document.createElement('pre');
+    const code = document.createElement('code');
+    code.textContent = node.text;
+    pre.appendChild(code);
+    return pre;
+  }
+
   const tag = tagMap[node.level] ?? 'p';
   const el = document.createElement(tag);
   el.textContent = node.text;
