@@ -19,39 +19,10 @@
         padding: 24px;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
       }
-      #log {
-        max-width: 600px;
-        margin: 16px auto 0;
-        background: #1e1e1e;
-        color: #d4d4d4;
-        border-radius: 8px;
-        padding: 16px;
-        font-family: monospace;
-        font-size: 13px;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-      #log:empty::before {
-        content: 'Event log will appear here...';
-        color: #666;
-      }
     </style>
-    <script>
-      window.logToPanel = function (msg) {
-        const el = document.getElementById('log');
-        const line = document.createElement('div');
-        line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
-        el.appendChild(line);
-        el.scrollTop = el.scrollHeight;
-      };
-    </script>
   </head>
   <body>
     <div id="app"></div>
-    <div id="log"></div>
-    <script type="module">
-      import init from './pkg/forma_ui_lib_wasm_example.js';
-      await init();
-    </script>
+    <script type="module" src="glue.js"></script>
   </body>
 </html>

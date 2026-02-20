@@ -27,7 +27,6 @@ name = "forma-ui-lib-wasm-example"
 version = "0.1.0"
 dependencies = [
  "forma-ui-lib-wasm",
- "wasm-bindgen",
 ]
 
 [[package]]
