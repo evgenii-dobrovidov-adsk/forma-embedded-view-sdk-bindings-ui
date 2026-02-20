@@ -51,6 +51,13 @@ impl UiBuilder {
         }
     }
 
+    /// Start a new UI tree rooted in a column layout with a custom gap in pixels.
+    pub fn new_col_with_gap(gap_px: i32) -> Self {
+        Self {
+            inner: ffi::new_col_with_gap(gap_px),
+        }
+    }
+
     /// Start a new UI tree rooted in a row layout.
     pub fn new_row() -> Self {
         Self {
@@ -58,10 +65,24 @@ impl UiBuilder {
         }
     }
 
+    /// Start a new UI tree rooted in a row layout with a custom gap in pixels.
+    pub fn new_row_with_gap(gap_px: i32) -> Self {
+        Self {
+            inner: ffi::new_row_with_gap(gap_px),
+        }
+    }
+
     /// Open a nested column inside the current container.
     pub fn col(self) -> Self {
         Self {
             inner: self.inner.col(),
+        }
+    }
+
+    /// Open a nested column with a custom gap in pixels.
+    pub fn col_with_gap(self, gap_px: i32) -> Self {
+        Self {
+            inner: self.inner.col_with_gap(gap_px),
         }
     }
 
@@ -76,6 +97,13 @@ impl UiBuilder {
     pub fn row(self) -> Self {
         Self {
             inner: self.inner.row(),
+        }
+    }
+
+    /// Open a nested row with a custom gap in pixels.
+    pub fn row_with_gap(self, gap_px: i32) -> Self {
+        Self {
+            inner: self.inner.row_with_gap(gap_px),
         }
     }
 
