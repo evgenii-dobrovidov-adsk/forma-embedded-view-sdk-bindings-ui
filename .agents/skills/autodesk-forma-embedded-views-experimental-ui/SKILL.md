@@ -5,7 +5,7 @@ description: Generate Rust WASM code that renders browser UIs using the forma-ui
 
 # Generate Rust UI code using `forma-ui-lib-wasm`
 
-Generate Rust code that renders UIs in a web browser via WebAssembly. The code uses the `forma_ui_lib_wasm` crate — a fluent builder API that delegates all DOM work to a JS library. Generated code MUST NOT use `web_sys` or any DOM APIs directly.
+Generate Rust code that renders UIs in a web browser via WebAssembly. The code uses the `forma_ui_lib_wasm` crate — a fluent builder API that delegates all DOM work to an internal JS library. The public API is pure Rust: all input/output types are concrete Rust enums and structs, callbacks are native Rust closures, and no WASM or DOM types (`js_sys`, `web_sys`, `wasm_bindgen`, `JsValue`, `Function`, `Closure`, `JsCast`) are exposed to consumers.
 
 ## Dependencies
 
@@ -16,18 +16,16 @@ The `forma-ui-lib-wasm` crate is **not published on crates.io**. A local Cargo p
 ```toml
 [dependencies]
 forma-ui-lib-wasm = { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-ui" }
-wasm-bindgen = "0.2"
-js-sys = "0.3"
 ```
+
+This is the **only** dependency needed. Do NOT add `wasm-bindgen`, `js-sys`, or `web-sys` — the crate handles all WASM/JS interop internally.
 
 Standard imports:
 
 ```rust
-use forma_ui_lib_wasm::UiBuilder;
-use js_sys::Function;
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::closure::Closure;
-use wasm_bindgen::JsCast;
+use forma_ui_lib_wasm::{
+    AlertType, ButtonVariant, InputType, SelectOption, TextLevel, UiBuilder,
+};
 ```
 
 ### JS package (`@forma/ui-lib`)
@@ -46,10 +44,7 @@ Build `@forma/ui-lib` first (`npm run build` in its directory), then point to it
     }
   }
 </script>
-<script type="module">
-  import init from './pkg/my_app.js';
-  await init();
-</script>
+<script type="module" src="glue.js"></script>
 ```
 
 The path in the import map is relative to the HTML file and must point to the built `dist/index.js` (ES module output) of `@forma/ui-lib`.
@@ -69,6 +64,34 @@ Add `@forma/ui-lib` as a local dependency in the app's `package.json`:
 Or, if both packages live in the same monorepo, use npm/pnpm/yarn workspaces so that `@forma/ui-lib` is resolved automatically. Then use a bundler like Vite to serve the app — the bundler resolves the bare specifier during development and build.
 
 This is how the existing example in `packages/ui-lib-wasm/example/` works: the root `package.json` declares both packages as workspaces, and `vite serve` resolves `@forma/ui-lib` via the workspace link.
+
+## Types
+
+All variant/level/type parameters use concrete Rust enums. No raw strings.
+
+### `TextLevel`
+
+`TextLevel::H1`, `TextLevel::H2`, `TextLevel::H3`, `TextLevel::P`, `TextLevel::Code`
+
+### `AlertType`
+
+`AlertType::Error`, `AlertType::Warning`, `AlertType::Info`
+
+### `InputType`
+
+`InputType::Text`, `InputType::Number`, `InputType::Email`, `InputType::Password`, `InputType::Tel`, `InputType::Url`, `InputType::Search`, `InputType::Date`, `InputType::Time`, `InputType::DateTimeLocal`, `InputType::Month`, `InputType::Week`, `InputType::Color`, `InputType::Range`, `InputType::Hidden`
+
+### `ButtonVariant`
+
+`ButtonVariant::Outlined`, `ButtonVariant::Flat`, `ButtonVariant::Solid`
+
+### `SelectOption`
+
+```rust
+SelectOption::new("value", "Label")
+```
+
+Or construct directly: `SelectOption { value: String, label: String }`.
 
 ## API reference
 
@@ -97,33 +120,29 @@ Unclosed containers are auto-closed by `.render_into()`.
 #### Text
 
 ```rust
-.p(text: &str, level: &str) -> UiBuilder
+.p(text: &str, level: TextLevel) -> UiBuilder
 ```
 
-`level`: `"h1"`, `"h2"`, `"h3"`, `"p"`, `"code"`
+`TextLevel::Code` renders inside a `<pre><code>` block that preserves newlines and whitespace.
 
 #### Button
 
 ```rust
-.button(label: &str, disabled: bool, variant: &str, on_click: Option<Function>) -> UiBuilder
+.button(label: &str, disabled: bool, variant: ButtonVariant, on_click: Option<Box<dyn FnMut() + 'static>>) -> UiBuilder
 ```
-
-`variant`: `"outlined"`, `"flat"`, `"solid"`
 
 #### Input
 
 ```rust
-.input(input_type: &str, placeholder: &str, value: &str, disabled: bool, on_change: Option<Function>) -> UiBuilder
+.input(input_type: InputType, placeholder: &str, value: &str, disabled: bool, on_change: Option<Box<dyn FnMut(String) + 'static>>) -> UiBuilder
 ```
-
-`input_type`: `"text"`, `"number"`, `"email"`, `"password"`, `"tel"`, `"url"`, `"search"`, `"date"`, `"time"`, `"datetime-local"`, `"month"`, `"week"`, `"color"`, `"range"`, `"hidden"`
 
 Callback receives: `String` (new value).
 
 #### Checkbox
 
 ```rust
-.checkbox(label: &str, checked: bool, disabled: bool, on_change: Option<Function>) -> UiBuilder
+.checkbox(label: &str, checked: bool, disabled: bool, on_change: Option<Box<dyn FnMut(bool) + 'static>>) -> UiBuilder
 ```
 
 Callback receives: `bool` (new checked state).
@@ -131,13 +150,7 @@ Callback receives: `bool` (new checked state).
 #### Select / Dropdown
 
 ```rust
-.select(options_json: &str, value: &str, placeholder: &str, disabled: bool, on_change: Option<Function>) -> UiBuilder
-```
-
-`options_json` must be a JSON array of `{"value":"...","label":"..."}` objects:
-
-```rust
-r#"[{"value":"a","label":"Option A"},{"value":"b","label":"Option B"}]"#
+.select(options: &[SelectOption], value: &str, placeholder: &str, disabled: bool, on_change: Option<Box<dyn FnMut(String) + 'static>>) -> UiBuilder
 ```
 
 Callback receives: `String` (selected value).
@@ -145,10 +158,10 @@ Callback receives: `String` (selected value).
 #### Alert / Banner
 
 ```rust
-.alert(text: &str, alert_type: &str, title: &str) -> UiBuilder
+.alert(text: &str, alert_type: AlertType, title: &str) -> UiBuilder
 ```
 
-`alert_type`: `"error"`, `"warning"`, `"info"`. Pass `""` for `title` to omit.
+Pass `""` for `title` to omit.
 
 #### Image
 
@@ -174,23 +187,10 @@ Consumes the builder. Replaces target element contents. Auto-closes unclosed con
 
 ## Callback pattern
 
-```rust
-fn cb(f: impl FnMut() + 'static) -> Function {
-    Closure::<dyn FnMut()>::new(f).into_js_value().unchecked_into()
-}
+Callbacks are native Rust closures boxed in `Option<Box<dyn FnMut(...) + 'static>>`. The crate converts them to JS functions internally — consumer code never touches `Closure`, `Function`, or `JsCast`.
 
-fn cb_str(f: impl FnMut(String) + 'static) -> Function {
-    Closure::<dyn FnMut(String)>::new(f).into_js_value().unchecked_into()
-}
-
-fn cb_bool(f: impl FnMut(bool) + 'static) -> Function {
-    Closure::<dyn FnMut(bool)>::new(f).into_js_value().unchecked_into()
-}
-```
-
-Use `Some(cb(...))` to provide, `None` to omit.
-
-`Closure::into_js_value()` consumes the closure and leaks memory so the JS function stays valid. Do NOT use `Closure::forget()`.
+Provide a callback: `Some(Box::new(|v: String| { /* ... */ }))`
+Omit a callback: `None`
 
 ## State management
 
@@ -210,24 +210,27 @@ Write: `COUNT.with(|c| c.set(val))`, `NAME.with(|n| *n.borrow_mut() = val)`
 
 Snapshot state into locals at the top of `render()`, build the UI, call `render()` again from callbacks that mutate state.
 
-## Entry point
+## Entry point and JS glue
+
+The entry point is a raw WASM export — no `#[wasm_bindgen]` attribute needed:
 
 ```rust
-#[wasm_bindgen(start)]
-pub fn start() {
+#[no_mangle]
+pub extern "C" fn start() {
     render();
 }
 ```
 
-## Host function imports
+A small JS glue file loads the WASM module and calls the export:
 
-```rust
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_name = "myGlobalFn")]
-    fn my_global_fn(arg: &str);
-}
+```js
+import init from './pkg/my_app.js';
+
+const wasm = await init();
+wasm.start();
 ```
+
+The wasm-bindgen generated `init` handles all internal FFI bindings. The glue file simply calls the raw WASM `start` export afterwards.
 
 ## Complete example
 
@@ -235,27 +238,17 @@ Counter with name input:
 
 ```rust
 use std::cell::{Cell, RefCell};
-use forma_ui_lib_wasm::UiBuilder;
-use js_sys::Function;
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::closure::Closure;
-use wasm_bindgen::JsCast;
+use forma_ui_lib_wasm::{
+    AlertType, ButtonVariant, InputType, TextLevel, UiBuilder,
+};
 
 thread_local! {
     static COUNT: Cell<u32> = Cell::new(0);
     static NAME: RefCell<String> = RefCell::new(String::new());
 }
 
-fn cb(f: impl FnMut() + 'static) -> Function {
-    Closure::<dyn FnMut()>::new(f).into_js_value().unchecked_into()
-}
-
-fn cb_str(f: impl FnMut(String) + 'static) -> Function {
-    Closure::<dyn FnMut(String)>::new(f).into_js_value().unchecked_into()
-}
-
-#[wasm_bindgen(start)]
-pub fn start() {
+#[no_mangle]
+pub extern "C" fn start() {
     render();
 }
 
@@ -269,37 +262,39 @@ fn render() {
     };
 
     UiBuilder::new_col()
-        .p(&greeting, "h1")
+        .p(&greeting, TextLevel::H1)
         .separator()
         .row()
-            .input("text", "Your name...", &name, false, Some(cb_str(|v| {
+            .input(InputType::Text, "Your name...", &name, false, Some(Box::new(|v: String| {
                 NAME.with(|n| *n.borrow_mut() = v);
                 render();
             })))
         .end_row()
         .row()
-            .button("+1", false, "solid", Some(cb(|| {
+            .button("+1", false, ButtonVariant::Solid, Some(Box::new(|| {
                 COUNT.with(|c| c.set(c.get() + 1));
                 render();
             })))
-            .button("Reset", false, "outlined", Some(cb(|| {
+            .button("Reset", false, ButtonVariant::Outlined, Some(Box::new(|| {
                 COUNT.with(|c| c.set(0));
                 render();
             })))
         .end_row()
         .separator()
-        .alert(&format!("Current count is {}.", count), "info", "")
+        .alert(&format!("Current count is {}.", count), AlertType::Info, "")
     .render_into("#app");
 }
 ```
 
 ## Rules
 
-1. NEVER import `web_sys` or use DOM APIs directly.
+1. NEVER import `web_sys`, `js_sys`, `wasm_bindgen`, or use DOM/WASM types directly. The only dependency is `forma-ui-lib-wasm`.
 2. ALWAYS use `UiBuilder` for all UI construction.
 3. ALWAYS call `.render_into(selector)` as the final chain step.
-4. ALWAYS use `Closure::into_js_value().unchecked_into()` for callbacks.
+4. ALWAYS use `Some(Box::new(|| { ... }))` for callbacks and `None` to omit.
 5. ALWAYS use `thread_local!` for mutable state, never `static mut`.
 6. ALWAYS snapshot state into locals before building the UI tree.
-7. For `select()`, pass options as a JSON string.
-8. For optional strings (`title` in `alert`, `alt` in `img`), pass `""` to omit.
+7. ALWAYS use typed enums (`TextLevel`, `InputType`, `ButtonVariant`, `AlertType`) — never raw strings.
+8. For `select()`, pass a `&[SelectOption]` slice.
+9. For optional strings (`title` in `alert`, `alt` in `img`), pass `""` to omit.
+10. Use `#[no_mangle] pub extern "C" fn start()` for the entry point, not `#[wasm_bindgen(start)]`.
