@@ -9,6 +9,8 @@ Generate Rust code that renders UIs in a web browser via WebAssembly. The code u
 
 ## Dependencies
 
+### Rust crate
+
 ```toml
 [dependencies]
 forma-ui-lib-wasm = { path = "..." }
@@ -25,6 +27,46 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
 ```
+
+### JS package (`@forma/ui-lib`)
+
+The Rust crate's generated wasm-bindgen JS glue contains `import ... from "@forma/ui-lib"`. The browser must be able to resolve this bare module specifier at runtime. The `@forma/ui-lib` package is **not published to NPM**, so it must be provided locally. There are two approaches:
+
+#### Option A: Import map in `index.html` (no bundler needed)
+
+Build `@forma/ui-lib` first (`npm run build` in its directory), then point to its ES module output using a `<script type="importmap">` **before** any `<script type="module">` tags:
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "@forma/ui-lib": "./path/to/packages/ui-lib/dist/index.js"
+    }
+  }
+</script>
+<script type="module">
+  import init from './pkg/my_app.js';
+  await init();
+</script>
+```
+
+The path in the import map is relative to the HTML file and must point to the built `dist/index.js` (ES module output) of `@forma/ui-lib`.
+
+#### Option B: Local `file:` dependency + bundler (Vite, etc.)
+
+Add `@forma/ui-lib` as a local dependency in the app's `package.json`:
+
+```json
+{
+  "dependencies": {
+    "@forma/ui-lib": "file:../path/to/packages/ui-lib"
+  }
+}
+```
+
+Or, if both packages live in the same monorepo, use npm/pnpm/yarn workspaces so that `@forma/ui-lib` is resolved automatically. Then use a bundler like Vite to serve the app — the bundler resolves the bare specifier during development and build.
+
+This is how the existing example in `packages/ui-lib-wasm/example/` works: the root `package.json` declares both packages as workspaces, and `vite serve` resolves `@forma/ui-lib` via the workspace link.
 
 ## API quick reference
 
