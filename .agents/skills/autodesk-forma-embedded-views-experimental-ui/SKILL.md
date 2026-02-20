@@ -11,9 +11,11 @@ Generate Rust code that renders UIs in a web browser via WebAssembly. The code u
 
 ### Rust crate
 
+The `forma-ui-lib-wasm` crate is **not published on crates.io**. A local Cargo patch is expected to be present that resolves it automatically from git. If that patch is missing or doesn't work, add the dependency directly from the git repository:
+
 ```toml
 [dependencies]
-forma-ui-lib-wasm = { path = "..." }
+forma-ui-lib-wasm = { git = "https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-ui" }
 wasm-bindgen = "0.2"
 js-sys = "0.3"
 ```
