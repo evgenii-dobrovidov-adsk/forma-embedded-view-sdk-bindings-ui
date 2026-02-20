@@ -48,8 +48,8 @@ col()
 
 | Method | Renders as | Key parameters |
 |--------|-----------|----------------|
-| `col()` / `endCol()` | Flex column (`align-items: stretch`) | -- |
-| `row()` / `endRow()` | Flex row (`align-items: center`) | -- |
+| `col(gapPx?)` / `endCol()` | Flex column (`align-items: stretch`) | gapPx (default: 8) |
+| `row(gapPx?)` / `endRow()` | Flex row (`align-items: center`) | gapPx (default: 8) |
 | `button()` | `<weave-button>` | label, disabled, variant, onClick |
 | `input()` | `<weave-input>` or native `<input>` | type, placeholder, value, disabled, onChange |
 | `p()` | `<h1>`/`<h2>`/`<h3>`/`<p>`/`<code>` | text, level |

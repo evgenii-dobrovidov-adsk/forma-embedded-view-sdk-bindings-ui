@@ -27,12 +27,12 @@ export interface SelectOption {
 }
 
 export type ContainerNode =
-  | { type: 'column'; children: NodeDesc[] }
-  | { type: 'row'; children: NodeDesc[] };
+  | { type: 'column'; gapPx: number; children: NodeDesc[] }
+  | { type: 'row'; gapPx: number; children: NodeDesc[] };
 
 export type NodeDesc =
-  | { type: 'column'; children: NodeDesc[] }
-  | { type: 'row'; children: NodeDesc[] }
+  | { type: 'column'; gapPx: number; children: NodeDesc[] }
+  | { type: 'row'; gapPx: number; children: NodeDesc[] }
   | {
       type: 'button';
       label: string;

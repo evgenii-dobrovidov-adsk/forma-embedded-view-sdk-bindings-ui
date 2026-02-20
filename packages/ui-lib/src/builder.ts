@@ -20,8 +20,8 @@ export class UIBuilder {
     return this.rootNodes;
   }
 
-  col(): this {
-    const node: ContainerNode = { type: 'column', children: [] };
+  col(gapPx = 8): this {
+    const node: ContainerNode = { type: 'column', gapPx, children: [] };
     this.current().push(node);
     this.stack.push(node);
     return this;
@@ -39,8 +39,8 @@ export class UIBuilder {
     return this;
   }
 
-  row(): this {
-    const node: ContainerNode = { type: 'row', children: [] };
+  row(gapPx = 8): this {
+    const node: ContainerNode = { type: 'row', gapPx, children: [] };
     this.current().push(node);
     this.stack.push(node);
     return this;

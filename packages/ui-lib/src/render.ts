@@ -32,6 +32,7 @@ function renderColumn(node: Extract<NodeDesc, { type: 'column' }>): HTMLElement 
   el.style.flexDirection = 'column';
   el.style.alignItems = 'stretch';
   el.style.justifyContent = 'flex-start';
+  el.style.gap = `${node.gapPx}px`;
 
   for (const child of node.children) {
     el.appendChild(renderNode(child));
@@ -45,7 +46,7 @@ function renderRow(node: Extract<NodeDesc, { type: 'row' }>): HTMLElement {
   el.style.flexDirection = 'row';
   el.style.alignItems = 'center';
   el.style.justifyContent = 'center';
-  el.style.gap = '8px';
+  el.style.gap = `${node.gapPx}px`;
 
   for (const child of node.children) {
     el.appendChild(renderNode(child));

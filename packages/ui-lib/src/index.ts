@@ -11,10 +11,10 @@ export type {
 
 import { UIBuilder } from './builder';
 
-export function col(): UIBuilder {
-  return new UIBuilder().col();
+export function col(gapPx = 8): UIBuilder {
+  return new UIBuilder().col(gapPx);
 }
 
-export function row(): UIBuilder {
-  return new UIBuilder().row();
+export function row(gapPx = 8): UIBuilder {
+  return new UIBuilder().row(gapPx);
 }
