@@ -27,7 +27,6 @@ name = "forma-ui-lib-wasm-example"
 version = "0.1.0"
 dependencies = [
  "forma-ui-lib-wasm",
- "js-sys",
  "wasm-bindgen",
 ]
 
@@ -132,3 +131,8 @@ checksum = "1f01b580c9ac74c8d8f0c0e4afb04eeef2acf145458e52c03845ee9cd23e3d12"
 dependencies = [
  "unicode-ident",
 ]
+
+[[patch.unused]]
+name = "forma-embedded-view-sdk"
+version = "0.1.0"
+source = "git+https://github.com/evgenii-dobrovidov-adsk/forma-embedded-view-sdk-bindings-rust.git#e889f7a84117ec32944e4cf7be73c8f63c9ead49"
