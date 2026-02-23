@@ -139,6 +139,9 @@ function renderText(node: Extract<NodeDesc, { type: 'text' }>): HTMLElement {
   const tag = tagMap[node.level] ?? 'p';
   const el = document.createElement(tag);
   el.textContent = node.text;
+  if (tag === 'p') {
+    el.style.margin = '0';
+  }
   return el;
 }
 
