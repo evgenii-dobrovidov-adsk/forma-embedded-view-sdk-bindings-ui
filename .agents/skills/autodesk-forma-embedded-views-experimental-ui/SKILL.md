@@ -1,6 +1,6 @@
 ---
 name: autodesk-forma-embedded-views-experimental-ui
-description: Generate Rust WASM code that renders browser UIs using the forma-ui-lib-wasm crate. Use when the user asks to build a UI, create a form, render components, or write Rust code targeting forma-ui-lib-wasm, UiBuilder, or the Forma embedded view SDK UI bindings.
+description: Generate Rust WASM code that renders browser UIs using the forma-ui-lib-wasm crate. Use when the user asks to build a UI, create a form, render components, or write Rust code targeting forma-ui-lib-wasm, UiBuilder, or the Forma Site Design embedded view SDK UI bindings.
 ---
 
 # Generate Rust UI code using `forma-ui-lib-wasm`

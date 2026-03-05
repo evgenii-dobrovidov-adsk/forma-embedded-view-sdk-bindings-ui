@@ -59,7 +59,7 @@ col()
 | `select()` | `<weave-select>` | options, value, placeholder, disabled, onChange |
 | `separator()` | `<hr>` | -- |
 
-Weave CSS and component JS files are **lazy-loaded** from the Forma CDN on first use.
+Weave CSS and component JS files are **lazy-loaded** from the Forma Site Design CDN on first use.
 
 ### `@forma/ui-lib-wasm` (Rust)
 
